@@ -1,0 +1,546 @@
+{
+    "name": "tag-tree",
+    "displayName": "Tag Tree",
+    "description": "Show tags in a tree view",
+    "keywords": [
+        "tag"
+    ],
+    "version": "0.0.179",
+    "license": "MIT",
+    "icon": "resources/tag-tree.png",
+    "publisher": "Warr1611",
+    "engines": {
+        "vscode": "^1.5.0"
+    },
+    "repository": "https://github.com/Warr1611/tag-tree",
+    "scripts": {
+        "test": "./node_modules/node-qunit/bin/cli.js -c utils.js -t test/tests.js"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "main": "./extension",
+    "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "tag-tree-container",
+                    "title": "Tags",
+                    "icon": "resources/tag-tree-container.svg"
+                }
+            ]
+        },
+        "views": {
+            "explorer": [
+                {
+                    "id": "tag-tree-view-explorer",
+                    "name": "TODOs",
+                    "when": "tag-tree-has-content && tag-tree-in-explorer"
+                }
+            ],
+            "tag-tree-container": [
+                {
+                    "id": "tag-tree-view",
+                    "name": "Tags"
+                }
+            ]
+        },
+        "menus": {
+            "view/title": [
+                {
+                    "command": "tag-tree.exportTree",
+                    "when": "view =~ /tag-tree/ && tag-tree-show-export-button == true",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "tag-tree.reveal",
+                    "when": "view =~ /tag-tree/ && tag-tree-show-reveal-button == true",
+                    "group": "navigation@2"
+                },
+                {
+                    "command": "tag-tree.scanOpenFilesOnly",
+                    "when": "view =~ /tag-tree/ && tag-tree-scan-mode == workspace && tag-tree-show-scan-mode-button == true",
+                    "group": "navigation@3"
+                },
+                {
+                    "command": "tag-tree.scanCurrentFileOnly",
+                    "when": "view =~ /tag-tree/ && tag-tree-scan-mode == 'open files' && tag-tree-show-scan-mode-button == true",
+                    "group": "navigation@3"
+                },
+                {
+                    "command": "tag-tree.scanWorkspace",
+                    "when": "view =~ /tag-tree/ && tag-tree-scan-mode == 'current file' && tag-tree-show-scan-mode-button == true",
+                    "group": "navigation@3"
+                },
+                {
+                    "command": "tag-tree.showFlatView",
+                    "when": "view =~ /tag-tree/ && tag-tree-flat == false && tag-tree-tags-only == false && tag-tree-show-view-style-button == true",
+                    "group": "navigation@4"
+                },
+                {
+                    "command": "tag-tree.showTagsOnlyView",
+                    "when": "view =~ /tag-tree/ && tag-tree-flat == true && tag-tree-tags-only == false && tag-tree-show-view-style-button == true",
+                    "group": "navigation@4"
+                },
+                {
+                    "command": "tag-tree.showTreeView",
+                    "when": "view =~ /tag-tree/ && tag-tree-flat == false && tag-tree-tags-only == true && tag-tree-show-view-style-button == true",
+                    "group": "navigation@4"
+                },
+                {
+                    "command": "tag-tree.filter",
+                    "when": "view =~ /tag-tree/ && tag-tree-filtered == false && tag-tree-show-filter-button == true",
+                    "group": "navigation@6"
+                },
+                {
+                    "command": "tag-tree.filterClear",
+                    "when": "view =~ /tag-tree/ && tag-tree-filtered == true && tag-tree-show-filter-button == true",
+                    "group": "navigation@6"
+                },
+                {
+                    "command": "tag-tree.refresh",
+                    "when": "view =~ /tag-tree/ && tag-tree-show-refresh-button == true",
+                    "group": "navigation@7"
+                },
+                {
+                    "command": "tag-tree.expand",
+                    "when": "view =~ /tag-tree/ && tag-tree-expanded == false && tag-tree-collapsible && tag-tree-show-expand-button == true",
+                    "group": "navigation@8"
+                },
+                {
+                    "command": "tag-tree.collapse",
+                    "when": "view =~ /tag-tree/ && tag-tree-expanded == true && tag-tree-collapsible && tag-tree-show-expand-button == true",
+                    "group": "navigation@8"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "tag-tree.showOnlyThisFolder",
+                    "when": "view =~ /tag-tree/ && viewItem == folder"
+                },
+                {
+                    "command": "tag-tree.showOnlyThisFolderAndSubfolders",
+                    "when": "view =~ /tag-tree/ && viewItem == folder"
+                },
+                {
+                    "command": "tag-tree.excludeThisFolder",
+                    "when": "view =~ /tag-tree/ && viewItem == folder"
+                },
+                {
+                    "command": "tag-tree.filterClear",
+                    "when": "view =~ /tag-tree/ && tag-tree-global-filter-active"
+                },
+                {
+                    "command": "tag-tree.resetFolderFilter",
+                    "when": "view =~ /tag-tree/ && tag-tree-folder-filter-active"
+                }
+            ]
+        },
+        "commands": [
+            {
+                "command": "tag-tree.showFlatView",
+                "title": "Show Flat View",
+                "category": "Todo Tree",
+                "icon": "$(list-unordered)"
+            },
+            {
+                "command": "tag-tree.showTagsOnlyView",
+                "title": "Show Tags Only View",
+                "category": "Todo Tree",
+                "icon": "$(list-flat)"
+            },
+            {
+                "command": "tag-tree.showTreeView",
+                "title": "Show Tree View",
+                "category": "Todo Tree",
+                "icon": "$(list-tree)"
+            },
+            {
+                "command": "tag-tree.refresh",
+                "title": "Refresh",
+                "category": "Todo Tree",
+                "icon": "$(refresh)"
+            },
+            {
+                "command": "tag-tree.expand",
+                "title": "Expand Tree",
+                "category": "Todo Tree",
+                "icon": "$(expand-all)"
+            },
+            {
+                "command": "tag-tree.collapse",
+                "title": "Collapse Tree",
+                "category": "Todo Tree",
+                "icon": "$(collapse-all)"
+            },
+            {
+                "command": "tag-tree.filter",
+                "title": "Filter Tree",
+                "category": "Todo Tree",
+                "icon": "$(filter)"
+            },
+            {
+                "command": "tag-tree.filterClear",
+                "title": "Clear Filter",
+                "category": "Todo Tree",
+                "icon": "$(clear-all)"
+            },
+            {
+                "command": "tag-tree.scanOpenFilesOnly",
+                "title": "Scan Open Files Only",
+                "category": "Todo Tree",
+                "icon": "$(files)"
+            },
+            {
+                "command": "tag-tree.scanCurrentFileOnly",
+                "title": "Scan Current File Only",
+                "category": "Todo Tree",
+                "icon": "$(symbol-file)"
+            },
+            {
+                "command": "tag-tree.scanWorkspace",
+                "title": "Scan Workspace",
+                "category": "Todo Tree",
+                "icon": "$(folder)"
+            },
+            {
+                "command": "tag-tree.exportTree",
+                "title": "Export Tree",
+                "category": "Todo Tree",
+                "icon": "$(save)"
+            },
+            {
+                "command": "tag-tree.showOnlyThisFolder",
+                "title": "Only Show This Folder",
+                "category": "Todo Tree",
+                "icon": "$(filter)"
+            },
+            {
+                "command": "tag-tree.showOnlyThisFolderAndSubfolders",
+                "title": "Only Show This Folder And Subfolders",
+                "category": "Todo Tree",
+                "icon": "$(filter)"
+            },
+            {
+                "command": "tag-tree.excludeThisFolder",
+                "title": "Hide This Folder",
+                "category": "Todo Tree",
+                "icon": "$(filter)"
+            },
+            {
+                "command": "tag-tree.resetFolderFilter",
+                "title": "Reset Folder Filter",
+                "category": "Todo Tree",
+                "icon": "$(clear-all)"
+            },
+            {
+                "command": "tag-tree.reveal",
+                "title": "Reveal Current File In Tree",
+                "category": "Todo Tree",
+                "icon": "$(location)"
+            },
+            {
+                "command": "tag-tree.resetCache",
+                "title": "Reset Cache",
+                "category": "Todo Tree"
+            }
+        ],
+        "configuration": {
+            "type": "object",
+            "title": "Tag Explorer",
+            "properties": {
+                "tag-tree.filtering.excludedWorkspaces": {
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    },
+                    "markdownDescription": "An array of workspace names to exclude as roots in the tree (wildcards can be used).",
+                    "type": "array"
+                },
+                "tag-tree.filtering.excludeGlobs": {
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    },
+                    "markdownDescription": "Globs for use in limiting search results by exclusion (applied after **includeGlobs**), e.g. `[\"**/*.txt\"]` to ignore all .txt files",
+                    "type": "array"
+                },
+                "tag-tree.filtering.ignoreGitSubmodules": {
+                    "default": false,
+                    "markdownDescription": "If true, any subfolders containing a .git file will be ignored when searching.",
+                    "type": "boolean"
+                },
+                "tag-tree.filtering.includedWorkspaces": {
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    },
+                    "markdownDescription": "An array of workspace names to include as roots in the tree (wildcards can be used). An empty array includes all workspace folders.",
+                    "type": "array"
+                },
+                "tag-tree.filtering.includeGlobs": {
+                    "default": [],
+                    "items": {
+                        "type": "string"
+                    },
+                    "markdownDescription": "Globs for use in limiting search results by inclusion, e.g. `[\"**/unit-tests/*.js\"]` to only show .js files in unit-tests subfolders",
+                    "type": "array"
+                },
+                "tag-tree.filtering.includeHiddenFiles": {
+                    "default": false,
+                    "markdownDescription": "Include hidden files (starting with a .)",
+                    "type": "boolean"
+                },
+                "tag-tree.filtering.passGlobsToRipgrep": {
+                    "default": true,
+                    "markdownDescription": "By default the globs are passed into ripgrep to narrow the search. Set this to false to apply the globs *after* the search (pre 0.0.132 behaviour).",
+                    "type": "boolean"
+                },
+                "tag-tree.filtering.useBuiltInExcludes": {
+                    "default": "none",
+                    "enum": [
+                        "none",
+                        "file excludes",
+                        "search excludes",
+                        "file and search excludes"
+                    ],
+                    "markdownDescription": "Add VSCode's `files.exclude` and/or `search.exclude` list to the ignored paths.",
+                    "markdownEnumDescriptions": [
+                        "Don't use any built in excludes",
+                        "Use the Files:Exclude setting",
+                        "Use the Search:Exclude setting",
+                        "Use the Files:Exclude and the Search:Exclude setting"
+                    ],
+                    "type": "string"
+                },
+                "tag-tree.general.debug": {
+                    "default": false,
+                    "markdownDescription": "Create a debug channel in the Output view",
+                    "type": "boolean"
+                },
+                "tag-tree.general.enableFileWatcher": {
+                    "default": false,
+                    "markdownDescription": "Set to true to enable automatic updates when files in the workspace are created, changed or deleted",
+                    "type": "boolean"
+                },
+                "tag-tree.general.fileWatcherGlob": {
+                    "default": "**/*",
+                    "markdownDescription": "Glob for use with the file watcher. Change this if the default setting causes performance issues.",
+                    "type": "string"
+                },
+                "tag-tree.general.rootFolder": {
+                    "default": "",
+                    "markdownDescription": "Folder in which to run the search (defaults to the workspace folder)",
+                    "type": "string"
+                },
+                "tag-tree.highlights.defaultHighlight": {
+                    "default": {},
+                    "markdownDescription": "Default configuration for highlighting. [Read more...](https://github.com/Warr1611/tag-tree#highlighting)",
+                    "type": "object"
+                },
+                "tag-tree.highlights.enabled": {
+                    "default": true,
+                    "markdownDescription": "Set to false to disable highlighting",
+                    "type": "boolean"
+                },
+                "tag-tree.highlights.highlightDelay": {
+                    "default": 500,
+                    "markdownDescription": "Delay before highlighting tags within files (milliseconds)",
+                    "type": "integer"
+                },
+                "tag-tree.highlights.schemes": {
+                    "default": [
+                        "file",
+                        "untitled"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "markdownDescription": "Editor schemes to show highlights in. To show highlights in settings files, for instance, add 'vscode-userdata' or for output windows, use 'output'.",
+                    "type": "array"
+                },
+                "tag-tree.regex.regex": {
+                    "default": "#[\\S]+",
+                    "markdownDescription": "Regular expression for matching Tags. *Note: $TAGS will be replaced by the tag list.*",
+                    "type": "string"
+                },
+                "tag-tree.regex.regexCaseSensitive": {
+                    "default": true,
+                    "markdownDescription": "Use a case sensitive regular expression",
+                    "type": "boolean"
+                },
+                "tag-tree.ripgrep.ripgrep": {
+                    "default": "",
+                    "markdownDescription": "Location of your version of ripgrep",
+                    "type": "string"
+                },
+                "tag-tree.ripgrep.ripgrepArgs": {
+                    "default": "--max-columns=1000 --no-config ",
+                    "markdownDescription": "Additional arguments to pass to ripgrep (Use with caution!)",
+                    "type": "string"
+                },
+                "tag-tree.ripgrep.ripgrepMaxBuffer": {
+                    "default": 200,
+                    "markdownDescription": "Size of the buffer to use for retrieving output from ripgrep (kilobytes)",
+                    "type": "integer"
+                },
+                "tag-tree.tree.autoRefresh": {
+                    "default": true,
+                    "markdownDescription": "Refresh the tree when files are opened or saved",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.disableCompactFolders": {
+                    "default": false,
+                    "markdownDescription": "Prevent the tree from showing compact folders",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.expanded": {
+                    "default": false,
+                    "markdownDescription": "When opening new workspaces, show the tree initially fully expanded",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.filterCaseSensitive": {
+                    "default": false,
+                    "markdownDescription": "Set to true if you want the view filtering to be case sensitive",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.flat": {
+                    "default": false,
+                    "markdownDescription": "When opening new workspaces, show the tree initially as flat list of files",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.hideTreeWhenEmpty": {
+                    "default": true,
+                    "markdownDescription": "Normally, the tree is removed from the explorer view if nothing is found. Set this to false to keep the view present.",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.labelFormat": {
+                    "default": "${tag} ${after}",
+                    "markdownDescription": "Format for tree items",
+                    "type": "string"
+                },
+                "tag-tree.tree.scanAtStartup": {
+                    "default": true,
+                    "markdownDescription": "Normally the tree is built as soon as the window is opened. If you have a large code base and want to manually start the scan, set this to false.",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.scanMode": {
+                    "default": "workspace",
+                    "enum": [
+                        "workspace",
+                        "open files",
+                        "current file"
+                    ],
+                    "markdownDescription": "Set this to change which files are scanned",
+                    "markdownEnumDescriptions": [
+                        "Scan the whole workspace (or workspaces)",
+                        "Scan open files only",
+                        "Scan the current file only"
+                    ],
+                    "type": "string"
+                },
+                "tag-tree.tree.showBadges": {
+                    "default": true,
+                    "markdownDescription": "Show badges and SCM state in the tree view",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.showCountsInTree": {
+                    "default": false,
+                    "markdownDescription": "Show counts of Tags in the tree",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.showInExplorer": {
+                    "default": true,
+                    "markdownDescription": "Show the tree in the explorer view",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.showScanModeButton": {
+                    "default": false,
+                    "markdownDescription": "Show a button on the tree view header to change between scanning the current file, open files, or the whole workspace.",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.showScanOpenFilesOrWorkspaceButton": {
+                    "default": false,
+                    "deprecationMessage": "This setting is no longer used, please use \"tag-tree.tree.scanMode\" instead.",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.buttons.reveal": {
+                    "default": true,
+                    "markdownDescription": "Show a button in the tree view title bar to reveal the current item (only when track file is not enabled)",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.buttons.scanMode": {
+                    "default": false,
+                    "markdownDescription": "Show a button in the tree view title bar to change the Scan Mode setting",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.buttons.viewStyle": {
+                    "default": true,
+                    "markdownDescription": "Show a button in the tree view title bar to change the view style (tree, flat or tags only)",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.buttons.filter": {
+                    "default": true,
+                    "markdownDescription": "Show a button in the tree view title bar allowing the tree to be filtered by entering some text",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.buttons.refresh": {
+                    "default": true,
+                    "markdownDescription": "Show a refresh button in the tree view title bar",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.buttons.expand": {
+                    "default": true,
+                    "markdownDescription": "Show a button in the tree view title bar to expand or collapse the whole tree",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.buttons.export": {
+                    "default": false,
+                    "markdownDescription": "Show a button in the tree view title bar to create a file showing the tree content",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.showTagsFromOpenFilesOnly": {
+                    "default": false,
+                    "deprecationMessage": "This setting is no longer used, please use \"tag-tree.tree.scanMode\" instead.",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.sortTagsOnlyViewAlphabetically": {
+                    "default": false,
+                    "markdownDescription": "Sort items in the tags only view alphabetically instead of by file and line number",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.tagsOnly": {
+                    "default": false,
+                    "markdownDescription": "When opening new workspaces, show only tag elements in tree",
+                    "type": "boolean"
+                },
+                "tag-tree.tree.tooltipFormat": {
+                    "default": "${filepath}, line ${line}",
+                    "markdownDescription": "Tree item tooltip format",
+                    "type": "string"
+                },
+                "tag-tree.tree.trackFile": {
+                    "default": true,
+                    "markdownDescription": "Track the current file in the tree view",
+                    "type": "boolean"
+                }
+            }
+        }
+    },
+    // "__metadata": {
+    //     "id": "261cac81-cd7b-4555-bb41-0c2d2bcd3e70",
+    //     "publisherId": "d4906d2e-f2ee-492d-9c7c-02b6160599ec",
+    //     "publisherDisplayName": "Warr1611"
+    // },
+    "dependencies": {
+        "comment-patterns": "^0.10.1",
+        "fast-strftime": "^1.1.1",
+        "find": "^0.3.0",
+        "micromatch": "^4.0.2",
+        "octicons": "^8.3.0",
+        "treeify": "^1.1.0"
+    }
+}
