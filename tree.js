@@ -477,7 +477,7 @@ class TreeNodeProvider
                 }
 
                 treeItem.command = {
-                    command: "tag-tree.revealTodo",
+                    command: "tagexplorer.revealTodo",
                     title: "",
                     arguments: [
                         node.fsPath,

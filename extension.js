@@ -50,8 +50,8 @@ function activate( context )
 
     provider = new tree.TreeNodeProvider( context, debug );
 
-    var todoTreeViewExplorer = vscode.window.createTreeView( "tag-tree-view-explorer", { treeDataProvider: provider } );
-    var todoTreeView = vscode.window.createTreeView( "tag-tree-view", { treeDataProvider: provider } );
+    var todoTreeViewExplorer = vscode.window.createTreeView( "tagexplorer-view-explorer", { treeDataProvider: provider } );
+    var todoTreeView = vscode.window.createTreeView( "tagexplorer-view", { treeDataProvider: provider } );
 
     var fileSystemWatcher;
 
@@ -77,7 +77,7 @@ function activate( context )
             outputChannel.dispose();
             outputChannel = undefined;
         }
-        if( vscode.workspace.getConfiguration( 'tag-tree.general' ).debug === true )
+        if( vscode.workspace.getConfiguration( 'tagexplorer.general' ).debug === true )
         {
             outputChannel = vscode.window.createOutputChannel( "Todo Tree" );
         }
@@ -105,11 +105,11 @@ function activate( context )
             fileSystemWatcher = undefined;
         }
 
-        if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).scanMode === 'workspace' )
+        if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).scanMode === 'workspace' )
         {
-            if( vscode.workspace.getConfiguration( 'tag-tree.general' ).enableFileWatcher === true )
+            if( vscode.workspace.getConfiguration( 'tagexplorer.general' ).enableFileWatcher === true )
             {
-                var glob = vscode.workspace.getConfiguration( 'tag-tree.general' ).fileWatcherGlob;
+                var glob = vscode.workspace.getConfiguration( 'tagexplorer.general' ).fileWatcherGlob;
 
                 fileSystemWatcher = vscode.workspace.createFileSystemWatcher( glob );
 
@@ -216,7 +216,7 @@ function activate( context )
             {
                 message += " (" + e.stderr + ")";
             }
-            vscode.window.showErrorMessage( "tag-tree: " + message );
+            vscode.window.showErrorMessage( "tagexplorer: " + message );
             onComplete();
         } );
     }
@@ -262,7 +262,7 @@ function activate( context )
 
     function getOptions( filename )
     {
-        var c = vscode.workspace.getConfiguration( 'tag-tree' );
+        var c = vscode.workspace.getConfiguration( 'tagexplorer' );
 
         var tempIncludeGlobs = context.workspaceState.get( 'includeGlobs' ) || [];
         var tempExcludeGlobs = context.workspaceState.get( 'excludeGlobs' ) || [];
@@ -307,10 +307,10 @@ function activate( context )
 
     function searchWorkspaces( searchList )
     {
-        if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).scanMode === 'workspace' )
+        if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).scanMode === 'workspace' )
         {
-            var includes = vscode.workspace.getConfiguration( 'tag-tree.filtering' ).get( 'includedWorkspaces', [] );
-            var excludes = vscode.workspace.getConfiguration( 'tag-tree.filtering' ).get( 'excludedWorkspaces', [] );
+            var includes = vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).get( 'includedWorkspaces', [] );
+            var excludes = vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).get( 'excludedWorkspaces', [] );
             if( vscode.workspace.workspaceFolders )
             {
                 vscode.workspace.workspaceFolders.map( function( folder )
@@ -334,8 +334,8 @@ function activate( context )
 
     function applyGlobs()
     {
-        var includeGlobs = vscode.workspace.getConfiguration( 'tag-tree.filtering' ).get( 'includeGlobs' );
-        var excludeGlobs = vscode.workspace.getConfiguration( 'tag-tree.filtering' ).get( 'excludeGlobs' );
+        var includeGlobs = vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).get( 'includeGlobs' );
+        var excludeGlobs = vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).get( 'excludeGlobs' );
 
         var tempIncludeGlobs = context.workspaceState.get( 'includeGlobs' ) || [];
         var tempExcludeGlobs = context.workspaceState.get( 'excludeGlobs' ) || [];
@@ -361,7 +361,7 @@ function activate( context )
             search( getOptions( entry ), ( searchList.length > 0 ) ? iterateSearchList : function()
             {
                 debug( "Found " + searchResults.length + " items" );
-                if( vscode.workspace.getConfiguration( 'tag-tree.ripgrep' ).get( 'passGlobsToRipgrep' ) !== true )
+                if( vscode.workspace.getConfiguration( 'tagexplorer.ripgrep' ).get( 'passGlobsToRipgrep' ) !== true )
                 {
                     applyGlobs();
                 }
@@ -380,7 +380,7 @@ function activate( context )
     {
         var rootFolders = [];
         var valid = true;
-        var rootFolder = vscode.workspace.getConfiguration( 'tag-tree.general' ).get( 'rootFolder' );
+        var rootFolder = vscode.workspace.getConfiguration( 'tagexplorer.general' ).get( 'rootFolder' );
         if( rootFolder.indexOf( "${workspaceFolder}" ) > -1 )
         {
             if( vscode.workspace.workspaceFolders )
@@ -408,8 +408,8 @@ function activate( context )
             rootFolder = utils.replaceEnvironmentVariables( rootFolder );
         } );
 
-        var includes = vscode.workspace.getConfiguration( 'tag-tree.filtering' ).get( 'includedWorkspaces', [] );
-        var excludes = vscode.workspace.getConfiguration( 'tag-tree.filtering' ).get( 'excludedWorkspaces', [] );
+        var includes = vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).get( 'includedWorkspaces', [] );
+        var excludes = vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).get( 'excludedWorkspaces', [] );
 
         if( valid === true )
         {
@@ -433,11 +433,6 @@ function activate( context )
         provider.clear( vscode.workspace.workspaceFolders );
 
         interrupted = false;
-
-        status.text = "tag-tree: Scanning...";
-        status.show();
-        status.command = "tag-tree.stopScan";
-        status.tooltip = "Click to interrupt scan";
 
         searchList = getRootFolders();
 
@@ -463,7 +458,7 @@ function activate( context )
 
     function setButtonsAndContext()
     {
-        var c = vscode.workspace.getConfiguration( 'tag-tree' );
+        var c = vscode.workspace.getConfiguration( 'tagexplorer' );
         var isTagsOnly = context.workspaceState.get( 'tagsOnly', c.get( 'tree.tagsOnly', false ) );
         var isCollapsible = !isTagsOnly;
         var includeGlobs = context.workspaceState.get( 'includeGlobs' ) || [];
@@ -477,42 +472,42 @@ function activate( context )
         var showExpandButton = c.get( 'tree.buttons' ).expand === true;
         var showExportButton = c.get( 'tree.buttons' ).export === true;
 
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-show-reveal-button', showRevealButton && !c.get( 'tree.trackFile', false ) );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-show-scan-mode-button', showScanModeButton );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-show-view-style-button', showViewStyleButton );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-show-filter-button', showFilterButton );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-show-refresh-button', showRefreshButton );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-show-expand-button', showExpandButton );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-show-export-button', showExportButton );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-show-reveal-button', showRevealButton && !c.get( 'tree.trackFile', false ) );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-show-scan-mode-button', showScanModeButton );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-show-view-style-button', showViewStyleButton );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-show-filter-button', showFilterButton );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-show-refresh-button', showRefreshButton );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-show-expand-button', showExpandButton );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-show-export-button', showExportButton );
 
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-expanded', context.workspaceState.get( 'expanded', c.get( 'tree.expanded', false ) ) );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-flat', context.workspaceState.get( 'flat', c.get( 'tree.flat', false ) ) );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-tags-only', isTagsOnly );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-filtered', context.workspaceState.get( 'filtered', false ) );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-collapsible', isCollapsible );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-folder-filter-active', includeGlobs.length + excludeGlobs.length > 0 );
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-global-filter-active', currentFilter );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-expanded', context.workspaceState.get( 'expanded', c.get( 'tree.expanded', false ) ) );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-flat', context.workspaceState.get( 'flat', c.get( 'tree.flat', false ) ) );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-tags-only', isTagsOnly );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-filtered', context.workspaceState.get( 'filtered', false ) );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-collapsible', isCollapsible );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-folder-filter-active', includeGlobs.length + excludeGlobs.length > 0 );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-global-filter-active', currentFilter );
 
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-scan-mode', vscode.workspace.getConfiguration( 'tag-tree.tree' ).scanMode );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-scan-mode', vscode.workspace.getConfiguration( 'tagexplorer.tree' ).scanMode );
 
         var children = provider.getChildren();
         var empty = children.length === 1 && children[ 0 ].empty === true;
 
         if( c.get( "tree.hideTreeWhenEmpty" ) === true )
         {
-            vscode.commands.executeCommand( 'setContext', 'tag-tree-has-content', empty === false );
+            vscode.commands.executeCommand( 'setContext', 'tagexplorer-has-content', empty === false );
         }
         else
         {
-            vscode.commands.executeCommand( 'setContext', 'tag-tree-has-content', true );
+            vscode.commands.executeCommand( 'setContext', 'tagexplorer-has-content', true );
         }
     }
 
     function isIncluded( filename )
     {
-        var includeGlobs = vscode.workspace.getConfiguration( 'tag-tree.filtering' ).get( 'includeGlobs' );
-        var excludeGlobs = vscode.workspace.getConfiguration( 'tag-tree.filtering' ).get( 'excludeGlobs' );
-        var includeHiddenFiles = vscode.workspace.getConfiguration( 'tag-tree.filtering' ).get( 'includeHiddenFiles' );
+        var includeGlobs = vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).get( 'includeGlobs' );
+        var excludeGlobs = vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).get( 'excludeGlobs' );
+        var includeHiddenFiles = vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).get( 'includeHiddenFiles' );
 
         var tempIncludeGlobs = context.workspaceState.get( 'includeGlobs' ) || [];
         var tempExcludeGlobs = context.workspaceState.get( 'excludeGlobs' ) || [];
@@ -547,7 +542,7 @@ function activate( context )
                 file: document.fileName,
                 line: position.line + 1,
                 column: position.character + 1,
-                match: line
+                match: line  // TODO: convert this to the substring?
             };
         }
 
@@ -557,7 +552,7 @@ function activate( context )
 
         if( document.uri.scheme === 'file' && isIncluded( document.fileName ) === true )
         {
-            if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).scanMode !== SCAN_MODE_CURRENT_FILE || ( vscode.window.activeTextEditor && document.fileName === vscode.window.activeTextEditor.document.fileName ) )
+            if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).scanMode !== SCAN_MODE_CURRENT_FILE || ( vscode.window.activeTextEditor && document.fileName === vscode.window.activeTextEditor.document.fileName ) )
             {
                 var extractExtraLines = function( section )
                 {
@@ -674,17 +669,17 @@ function activate( context )
 
     function scanWorkspace()
     {
-        vscode.workspace.getConfiguration( 'tag-tree.tree' ).update( 'scanMode', 'workspace', vscode.ConfigurationTarget.Workspace );
+        vscode.workspace.getConfiguration( 'tagexplorer.tree' ).update( 'scanMode', 'workspace', vscode.ConfigurationTarget.Workspace );
     }
 
     function scanOpenFilesOnly()
     {
-        vscode.workspace.getConfiguration( 'tag-tree.tree' ).update( 'scanMode', SCAN_MODE_OPEN_FILES, vscode.ConfigurationTarget.Workspace );
+        vscode.workspace.getConfiguration( 'tagexplorer.tree' ).update( 'scanMode', SCAN_MODE_OPEN_FILES, vscode.ConfigurationTarget.Workspace );
     }
 
     function scanCurrentFileOnly()
     {
-        vscode.workspace.getConfiguration( 'tag-tree.tree' ).update( 'scanMode', SCAN_MODE_CURRENT_FILE, vscode.ConfigurationTarget.Workspace );
+        vscode.workspace.getConfiguration( 'tagexplorer.tree' ).update( 'scanMode', SCAN_MODE_CURRENT_FILE, vscode.ConfigurationTarget.Workspace );
     }
 
     function dumpFolderFilter()
@@ -727,13 +722,13 @@ function activate( context )
 
             function isUnset( settingName )
             {
-                var setting = vscode.workspace.getConfiguration( 'tag-tree' ).inspect( settingName );
+                var setting = vscode.workspace.getConfiguration( 'tagexplorer' ).inspect( settingName );
                 return setting.globalValue === undefined &&
                     setting.workspaceValue === undefined &&
                     setting.workspaceFolderValue === undefined;
             }
 
-            var c = vscode.workspace.getConfiguration( 'tag-tree' );
+            var c = vscode.workspace.getConfiguration( 'tagexplorer' );
             var migrated = false;
 
             migrateIfRequired( 'autoRefresh', 'boolean', 'tree' );
@@ -784,14 +779,14 @@ function activate( context )
 
             if( context.globalState.get( 'migratedVersion', 0 ) < 168 )
             {
-                vscode.workspace.getConfiguration( 'tag-tree.tree' ).update(
+                vscode.workspace.getConfiguration( 'tagexplorer.tree' ).update(
                     'showScanModeButton',
-                    vscode.workspace.getConfiguration( 'tag-tree.tree' ).showScanOpenFilesOrWorkspaceButton,
+                    vscode.workspace.getConfiguration( 'tagexplorer.tree' ).showScanOpenFilesOrWorkspaceButton,
                     vscode.ConfigurationTarget.Global );
 
-                if( vscode.workspace.getConfiguration( 'tag-tree.filtering' ).useBuiltInExcludes === true )
+                if( vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).useBuiltInExcludes === true )
                 {
-                    vscode.workspace.getConfiguration( 'tag-tree.filtering' ).update( 'useBuiltInExcludes', "file excludes", vscode.ConfigurationTarget.Global );
+                    vscode.workspace.getConfiguration( 'tagexplorer.filtering' ).update( 'useBuiltInExcludes', "file excludes", vscode.ConfigurationTarget.Global );
                 }
 
                 context.globalState.update( 'migratedVersion', 168 );
@@ -830,7 +825,7 @@ function activate( context )
 
                 if( document.uri.scheme === "file" && path.basename( document.fileName ) !== "settings.json" )
                 {
-                    if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).autoRefresh === true )
+                    if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).autoRefresh === true )
                     {
                         clearTimeout( fileRefreshTimeout );
                         fileRefreshTimeout = setTimeout( refreshFile, 500, document );
@@ -851,11 +846,11 @@ function activate( context )
         // We can't do anything if we can't find ripgrep
         if( !config.ripgrepPath() )
         {
-            vscode.window.showErrorMessage( "tag-tree: Failed to find vscode-ripgrep - please install ripgrep manually and set 'tag-tree.ripgrep' to point to the executable" );
+            vscode.window.showErrorMessage( "tagexplorer: Failed to find vscode-ripgrep - please install ripgrep manually and set 'tagexplorer.ripgrep' to point to the executable" );
             return;
         }
 
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.revealTodo', ( file, line, column, endColumn ) =>
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.revealTodo', ( file, line, column, endColumn ) =>
         {
             selectedDocument = file;
             vscode.workspace.openTextDocument( file ).then( function( document )
@@ -867,7 +862,7 @@ function activate( context )
             } );
         } ) );
 
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.filter', function()
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.filter', function()
         {
             vscode.window.showInputBox( { prompt: "Filter tree" } ).then(
                 function( term )
@@ -883,16 +878,13 @@ function activate( context )
                 } );
         } ) );
 
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.stopScan', function()
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.stopScan', function()
         {
             ripgrep.kill();
-            status.text = "tag-tree: Scanning interrupted.";
-            status.tooltip = "Click to restart";
-            status.command = "tag-tree.refresh";
             interrupted = true;
         } ) );
 
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.showOnlyThisFolder', function( node )
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.showOnlyThisFolder', function( node )
         {
             var rootNode = tree.locateWorkspaceNode( node.fsPath );
             var includeGlobs = [ utils.createFolderGlob( node.fsPath, rootNode.fsPath, "/*" ) ];
@@ -901,7 +893,7 @@ function activate( context )
             dumpFolderFilter();
         } ) );
 
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.showOnlyThisFolderAndSubfolders', function( node )
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.showOnlyThisFolderAndSubfolders', function( node )
         {
             var rootNode = tree.locateWorkspaceNode( node.fsPath );
             var includeGlobs = [ utils.createFolderGlob( node.fsPath, rootNode.fsPath, "/**/*" ) ];
@@ -910,7 +902,7 @@ function activate( context )
             dumpFolderFilter();
         } ) );
 
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.excludeThisFolder', function( node )
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.excludeThisFolder', function( node )
         {
             var rootNode = tree.locateWorkspaceNode( node.fsPath );
             var glob = utils.createFolderGlob( node.fsPath, rootNode.fsPath, "/**/*" );
@@ -924,7 +916,7 @@ function activate( context )
             dumpFolderFilter();
         } ) );
 
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.resetCache', function()
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.resetCache', function()
         {
             function purgeFolder( folder )
             {
@@ -952,7 +944,7 @@ function activate( context )
             purgeFolder( context.globalStoragePath );
         } ) );
 
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.resetFolderFilter', function()
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.resetFolderFilter', function()
         {
             context.workspaceState.update( 'includeGlobs', [] );
             context.workspaceState.update( 'excludeGlobs', [] );
@@ -960,7 +952,7 @@ function activate( context )
             dumpFolderFilter();
         } ) );
 
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.reveal', function()
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.reveal', function()
         {
             if( vscode.window.activeTextEditor )
             {
@@ -973,16 +965,16 @@ function activate( context )
         context.subscriptions.push( todoTreeViewExplorer.onDidCollapseElement( function( e ) { provider.setExpanded( e.element.fsPath, false ); } ) );
         context.subscriptions.push( todoTreeView.onDidCollapseElement( function( e ) { provider.setExpanded( e.element.fsPath, false ); } ) );
 
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.filterClear', clearFilter ) );
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.refresh', rebuild ) );
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.showFlatView', showFlatView ) );
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.showTagsOnlyView', showTagsOnlyView ) );
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.showTreeView', showTreeView ) );
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.expand', expand ) );
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.collapse', collapse ) );
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.scanWorkspace', scanWorkspace ) );
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.scanOpenFilesOnly', scanOpenFilesOnly ) );
-        context.subscriptions.push( vscode.commands.registerCommand( 'tag-tree.scanCurrentFileOnly', scanCurrentFileOnly ) );
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.filterClear', clearFilter ) );
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.refresh', rebuild ) );
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.showFlatView', showFlatView ) );
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.showTagsOnlyView', showTagsOnlyView ) );
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.showTreeView', showTreeView ) );
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.expand', expand ) );
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.collapse', collapse ) );
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.scanWorkspace', scanWorkspace ) );
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.scanOpenFilesOnly', scanOpenFilesOnly ) );
+        context.subscriptions.push( vscode.commands.registerCommand( 'tagexplorer.scanCurrentFileOnly', scanCurrentFileOnly ) );
 
         context.subscriptions.push( vscode.window.onDidChangeActiveTextEditor( function( e )
         {
@@ -990,13 +982,13 @@ function activate( context )
             {
                 openDocuments[ e.document.fileName ] = e.document;
 
-                if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).scanMode === SCAN_MODE_CURRENT_FILE )
+                if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).scanMode === SCAN_MODE_CURRENT_FILE )
                 {
                     provider.clear( vscode.workspace.workspaceFolders );
                     refreshFile( e.document );
                 }
 
-                if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).autoRefresh === true && vscode.workspace.getConfiguration( 'tag-tree.tree' ).trackFile === true )
+                if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).autoRefresh === true && vscode.workspace.getConfiguration( 'tagexplorer.tree' ).trackFile === true )
                 {
                     if( e.document.uri && e.document.uri.scheme === "file" )
                     {
@@ -1016,7 +1008,7 @@ function activate( context )
         {
             if( document.uri.scheme === "file" && path.basename( document.fileName ) !== "settings.json" )
             {
-                if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).autoRefresh === true )
+                if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).autoRefresh === true )
                 {
                     refreshFile( document );
                 }
@@ -1025,7 +1017,7 @@ function activate( context )
 
         context.subscriptions.push( vscode.workspace.onDidOpenTextDocument( document =>
         {
-            if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).autoRefresh === true )
+            if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).autoRefresh === true )
             {
                 if( document.uri.scheme === "file" )
                 {
@@ -1048,11 +1040,11 @@ function activate( context )
 
             delete openDocuments[ document.fileName ];
 
-            if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).autoRefresh === true )
+            if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).autoRefresh === true )
             {
                 if( document.uri.scheme === "file" )
                 {
-                    if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).scanMode !== 'workspace' )
+                    if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).scanMode !== 'workspace' )
                     {
                         removeFromTree( document.fileName );
                     }
@@ -1084,17 +1076,17 @@ function activate( context )
 
         context.subscriptions.push( vscode.workspace.onDidChangeConfiguration( function( e )
         {
-            if( e.affectsConfiguration( "tag-tree" ) ||
+            if( e.affectsConfiguration( "tagexplorer" ) ||
                 e.affectsConfiguration( 'files.exclude' ) ||
                 e.affectsConfiguration( 'explorer.compactFolders' ) )
             {
-                if( e.affectsConfiguration( "tag-tree.regex.regex" ) )
+                if( e.affectsConfiguration( "tagexplorer.regex.regex" ) )
                 {
                     return;
                 }
 
-                if( e.affectsConfiguration( "tag-tree.highlights.enabled" ) ||
-                    e.affectsConfiguration( "tag-tree.highlights.defaultHighlight" ))
+                if( e.affectsConfiguration( "tagexplorer.highlights.enabled" ) ||
+                    e.affectsConfiguration( "tagexplorer.highlights.defaultHighlight" ))
                 {
                     validateColours();
                     colours.refreshComplementaryColours();
@@ -1103,21 +1095,21 @@ function activate( context )
                         documentChanged( vscode.window.activeTextEditor.document );
                     }
                 }
-                else if( e.affectsConfiguration( "tag-tree.general.debug" ) )
+                else if( e.affectsConfiguration( "tagexplorer.general.debug" ) )
                 {
                     resetOutputChannel();
                 }
-                else if( e.affectsConfiguration( "tag-tree.general.enableFileWatcher" ) ||
-                    e.affectsConfiguration( "tag-tree.general.fileWatcherGlob" ) )
+                else if( e.affectsConfiguration( "tagexplorer.general.enableFileWatcher" ) ||
+                    e.affectsConfiguration( "tagexplorer.general.fileWatcherGlob" ) )
                 {
                     resetFileSystemWatcher();
                 }
 
-                if( e.affectsConfiguration( "tag-tree.filtering" ) ||
-                    e.affectsConfiguration( "tag-tree.regex" ) ||
-                    e.affectsConfiguration( "tag-tree.ripgrep" ) ||
-                    e.affectsConfiguration( "tag-tree.tree" ) ||
-                    e.affectsConfiguration( "tag-tree.general.rootFolder" ) ||
+                if( e.affectsConfiguration( "tagexplorer.filtering" ) ||
+                    e.affectsConfiguration( "tagexplorer.regex" ) ||
+                    e.affectsConfiguration( "tagexplorer.ripgrep" ) ||
+                    e.affectsConfiguration( "tagexplorer.tree" ) ||
+                    e.affectsConfiguration( "tagexplorer.general.rootFolder" ) ||
                     e.affectsConfiguration( "files.exclude" ) )
                 {
                     rebuild();
@@ -1128,7 +1120,7 @@ function activate( context )
                     refresh();
                 }
 
-                vscode.commands.executeCommand( 'setContext', 'tag-tree-in-explorer', vscode.workspace.getConfiguration( 'tag-tree.tree' ).showInExplorer );
+                vscode.commands.executeCommand( 'setContext', 'tagexplorer-in-explorer', vscode.workspace.getConfiguration( 'tagexplorer.tree' ).showInExplorer );
                 setButtonsAndContext();
             }
         } ) );
@@ -1147,7 +1139,7 @@ function activate( context )
 
         context.subscriptions.push( outputChannel );
 
-        vscode.commands.executeCommand( 'setContext', 'tag-tree-in-explorer', vscode.workspace.getConfiguration( 'tag-tree.tree' ).showInExplorer );
+        vscode.commands.executeCommand( 'setContext', 'tagexplorer-in-explorer', vscode.workspace.getConfiguration( 'tagexplorer.tree' ).showInExplorer );
 
         resetOutputChannel();
 
@@ -1157,7 +1149,7 @@ function activate( context )
         validateColours();
         setButtonsAndContext();
 
-        if( vscode.workspace.getConfiguration( 'tag-tree.tree' ).scanAtStartup === true )
+        if( vscode.workspace.getConfiguration( 'tagexplorer.tree' ).scanAtStartup === true )
         {
             rebuild();
 

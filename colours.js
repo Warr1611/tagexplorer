@@ -69,7 +69,7 @@ function getOtherColours()
 
     var colours = [];
 
-    var config = vscode.workspace.getConfiguration( 'tag-tree.highlights' );
+    var config = vscode.workspace.getConfiguration( 'tagexplorer.highlights' );
 
     addColour( config.get( 'defaultHighlight' ).foreground );
     addColour( config.get( 'defaultHighlight' ).background );
@@ -115,7 +115,7 @@ function validate( workspace )
 {
     function check( setting )
     {
-        var definedColour = workspace.getConfiguration( 'tag-tree.highlights' ).get( setting );
+        var definedColour = workspace.getConfiguration( 'tagexplorer.highlights' ).get( setting );
         if( isInvalidColour( definedColour ) )
         {
             invalidColours.push( setting + ' (' + definedColour + ')' );

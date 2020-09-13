@@ -205,7 +205,7 @@
 
 ## v0.0.145 - 2019-09-07
 
-- Allow use of the tag-tree icon in the tree
+- Allow use of the tagexplorer icon in the tree
 
 ## v0.0.144 - 2019-09-07
 
@@ -458,7 +458,7 @@
 - Major refactor to simplify and remove unused code
 - Stop using ripgrep for single file updates
 - Add configuration setting for badges and SCM state
-- Fix configuration example and rust regex link ([#82](https://github.com/Gruntfuggly/tag-tree/issues/82) and [#79](https://github.com/Gruntfuggly/tag-tree/issues/79))
+- Fix configuration example and rust regex link ([#82](https://github.com/Gruntfuggly/tagexplorer/issues/82) and [#79](https://github.com/Gruntfuggly/tagexplorer/issues/79))
 - Support multiple workspaces properly
 - Preserve expansion state when changing view and reloading the window
 
@@ -473,7 +473,7 @@
 ## v0.0.90 - 2018-09-28
 
 - Allow proper highlighting without using tags setting
-- Reveal items in the middle of the window ([#76](https://github.com/Gruntfuggly/tag-tree/issues/76)
+- Reveal items in the middle of the window ([#76](https://github.com/Gruntfuggly/tagexplorer/issues/76)
 
 ## v0.0.89 - 2018-09-26
 
@@ -493,11 +493,11 @@
 
 ## v0.0.85 - 2018-09-07
 
-- Restore 'expanded', 'flat' and 'grouped' default configuration settings  (fixes [#68](https://github.com/Gruntfuggly/tag-tree/issues/68))
+- Restore 'expanded', 'flat' and 'grouped' default configuration settings  (fixes [#68](https://github.com/Gruntfuggly/tagexplorer/issues/68))
 
 ## v0.0.84 - 2018-09-06
 
-- Fix tree elements not appearing when there is no workspace (fixes [#67](https://github.com/Gruntfuggly/tag-tree/issues/67))
+- Fix tree elements not appearing when there is no workspace (fixes [#67](https://github.com/Gruntfuggly/tagexplorer/issues/67))
 - Use workspaceState for view state instead of workspace settings
 - Remove redundant settings from README.md
 - Fix a bunch of typos in various files
@@ -548,7 +548,7 @@
 
 ## v0.0.73 - 2018-07-30
 
-- Show highlights in all editors (not just the active editor) (fixes [#61](https://github.com/Gruntfuggly/tag-tree/issues/61))
+- Show highlights in all editors (not just the active editor) (fixes [#61](https://github.com/Gruntfuggly/tagexplorer/issues/61))
 
 ## v0.0.72 - 2018-07-16
 
@@ -656,7 +656,7 @@
 
 ## v0.0.33 - 2018-04-27
 
-- Allow variable substitution (including ${workspaceFolder}) in tag-tree.rootFolder
+- Allow variable substitution (including ${workspaceFolder}) in tagexplorer.rootFolder
 
 ## v0.0.32 - 2018-04-25
 
@@ -777,7 +777,7 @@
 
 ## v0.0.6 - 2017-11-28
 
-- Only attempt install if tag-tree.ripgrep is not defined and show some info if the install fails
+- Only attempt install if tagexplorer.ripgrep is not defined and show some info if the install fails
 
 ## v0.0.5 - 2017-11-28
 

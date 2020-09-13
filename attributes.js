@@ -2,7 +2,7 @@ var vscode = require( 'vscode' );
 
 function getAttribute( tag, attribute, defaultValue )
 {
-    var config = vscode.workspace.getConfiguration( 'tag-tree.highlights' );
+    var config = vscode.workspace.getConfiguration( 'tagexplorer.highlights' );
     var defaultHighlight = config.get( 'defaultHighlight' );
     if( defaultHighlight[ attribute ] !== undefined )
     {

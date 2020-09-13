@@ -187,7 +187,7 @@ function showInGutter( tag )
 
 function getType( tag )
 {
-    return attributes.getAttribute( tag, 'type', vscode.workspace.getConfiguration( 'tag-tree.highlights' ).get( 'highlight' ) );
+    return attributes.getAttribute( tag, 'type', vscode.workspace.getConfiguration( 'tagexplorer.highlights' ).get( 'highlight' ) );
 }
 
 function highlight( editor )
@@ -206,7 +206,7 @@ function highlight( editor )
 
         decorations[ editor.id ] = [];
 
-        if( vscode.workspace.getConfiguration( 'tag-tree.highlights' ).get( 'enabled', true ) )
+        if( vscode.workspace.getConfiguration( 'tagexplorer.highlights' ).get( 'enabled', true ) )
         {
             var text = editor.document.getText();
             var regex = utils.getRegexForEditorSearch();
@@ -281,7 +281,7 @@ function triggerHighlight( editor )
         {
             clearTimeout( highlightTimer[ editor.id ] );
         }
-        highlightTimer[ editor.id ] = setTimeout( highlight, vscode.workspace.getConfiguration( 'tag-tree.highlights' ).highlightDelay, editor );
+        highlightTimer[ editor.id ] = setTimeout( highlight, vscode.workspace.getConfiguration( 'tagexplorer.highlights' ).highlightDelay, editor );
     }
 }
 
